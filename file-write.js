@@ -22,8 +22,12 @@ const callbackWriteToFile = async () => {
       return
     }
 
-    for (let index = 0; index < 1000000; index++) {
-      // fs.write(fd, `${index} `, () => {})
+    // this will run into javascript heap out of memory because callback functions are stored in event loop which goes out of memory
+    // for (let index = 0; index < 10000000; index++) {
+    //   fs.write(fd, `${index} `, () => {})
+    // }
+
+    for (let index = 0; index < 10000000; index++) {
       fs.writeSync(fd, `${index} `)
     }
     console.timeEnd("callbackWriteToFile")
@@ -47,4 +51,44 @@ const streamWriteToFile = async () => {
   console.timeEnd("streamWriteToFile")
 }
 
-streamWriteToFile()
+// streamWriteToFile()
+
+const streamWriteToFile2 = async () => {
+  console.time("streamWriteToFile2")
+
+  const file = await fspromises.open("test.txt", "w")
+  const writeStream = file.createWriteStream()
+
+  let i = 0
+  let MAX_WRITE = 1000000
+
+  const writeToFile = () => {
+
+    while (i < MAX_WRITE) {
+      const buff = Buffer.from(`${i} `, 'utf-8')
+
+      if (i === MAX_WRITE - 1) {
+        return writeStream.end(buff)
+      }
+
+      const isWrite = writeStream.write(buff)
+      
+      if (!isWrite) break
+      i++
+    }
+  }
+
+  writeToFile()
+
+  writeStream.on("drain", () => {
+    console.log("Draining");
+    writeToFile()
+  })
+
+  writeStream.on("finish", () => {
+    console.timeEnd("streamWriteToFile2")
+  })
+
+}
+
+streamWriteToFile2()
