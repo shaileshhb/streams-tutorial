@@ -3,7 +3,7 @@ const fs = require("fs")
 
 const slowestWriteToFile = async () => {
   console.time("slowestWriteToFile")
-  const file = await fspromises.open("test.txt", "w")
+  const file = await fspromises.open("../src.txt", "w")
 
   for (let index = 0; index < 100000; index++) {
     await file.write(`${index} `)
@@ -16,7 +16,7 @@ const slowestWriteToFile = async () => {
 
 const callbackWriteToFile = async () => {
   console.time("callbackWriteToFile")
-  fs.open("test.txt", "w", async (err, fd) => {
+  fs.open("../src.txt", "w", async (err, fd) => {
     if (err) {
       console.log(err);
       return
@@ -40,8 +40,10 @@ const callbackWriteToFile = async () => {
 const streamWriteToFile = async () => {
   console.time("streamWriteToFile")
 
-  const file = await fspromises.open("test.txt", "w")
+  const file = await fspromises.open("../src.txt", "w")
   const writeStream = file.createWriteStream()
+
+  fs.createWriteStream("../src.txt", {highWaterMark: 400})
 
   for (let index = 0; index < 100000; index++) {
     const buff = Buffer.from(`${index} `, 'utf-8')
@@ -56,11 +58,11 @@ const streamWriteToFile = async () => {
 const streamWriteToFile2 = async () => {
   console.time("streamWriteToFile2")
 
-  const file = await fspromises.open("test.txt", "w")
+  const file = await fspromises.open("../src.txt", "w")
   const writeStream = file.createWriteStream()
 
   let i = 0
-  let MAX_WRITE = 1000000
+  let MAX_WRITE = 10000000
 
   const writeToFile = () => {
 
@@ -85,8 +87,10 @@ const streamWriteToFile2 = async () => {
     writeToFile()
   })
 
+  
   writeStream.on("finish", () => {
     console.timeEnd("streamWriteToFile2")
+    writeStream.close()
   })
 
 }
