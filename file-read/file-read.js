@@ -5,8 +5,8 @@ const basicFileRead = async () => {
   const readStream = fs.createReadStream("../src.txt")
 
   readStream.on("data", (chunk) => {
-    console.log("==========================");
-    console.log(chunk.toString());
+    const numbers = chunk.toString().split(" ")
+    console.log(numbers);
   })
 
   readStream.on("end", () => {
@@ -39,4 +39,4 @@ const basicReadWrite = async () => {
   })
 }
 
-basicReadWrite()
+// basicReadWrite()

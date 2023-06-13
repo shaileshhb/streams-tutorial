@@ -62,7 +62,7 @@ const streamWriteToFile2 = async () => {
   const writeStream = file.createWriteStream()
 
   let i = 0
-  let MAX_WRITE = 10000000
+  let MAX_WRITE = 1000000
 
   const writeToFile = () => {
 
